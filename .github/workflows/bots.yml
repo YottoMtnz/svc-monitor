@@ -1,4 +1,4 @@
-name: Bots de Juegos 24/7
+name: Service Monitor
 
 on:
   push:
@@ -8,22 +8,16 @@ on:
   workflow_dispatch:
 
 jobs:
-  run-bots:
+  run:
     runs-on: ubuntu-latest
     timeout-minutes: 290
     steps:
       - uses: actions/checkout@v4
-      - name: Setup Python
-        uses: actions/setup-python@v5
+      - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - name: Install deps
-        run: pip install requests
-      - name: Run bots
-        run: |
-          python3 bot-juegos-1/bot.py &
-          PID1=$!
-          python3 bot-juegos-2/bot.py &
-          PID2=$!
-          echo "Bots iniciados: $PID1 $PID2"
-          wait $PID1 $PID2
+      - run: pip install requests
+      - run: |
+          TOKEN_A="${{ secrets.TOKEN_A }}" python3 svc-a/bot.py &
+          TOKEN_B="${{ secrets.TOKEN_B }}" python3 svc-b/bot.py &
+          wait
