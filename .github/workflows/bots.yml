@@ -1,0 +1,29 @@
+name: Bots de Juegos 24/7
+
+on:
+  push:
+    branches: [main]
+  schedule:
+    - cron: '0 */5 * * *'
+  workflow_dispatch:
+
+jobs:
+  run-bots:
+    runs-on: ubuntu-latest
+    timeout-minutes: 290
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install deps
+        run: pip install requests
+      - name: Run bots
+        run: |
+          python3 bot-juegos-1/bot.py &
+          PID1=$!
+          python3 bot-juegos-2/bot.py &
+          PID2=$!
+          echo "Bots iniciados: $PID1 $PID2"
+          wait $PID1 $PID2
