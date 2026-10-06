@@ -37,21 +37,6 @@ def handle_start_game(chat_id, user, game_id):
             try: send(admin_id, alerta)
             except Exception as e: print(f'Error admin {admin_id}: {e}')
 
-def tiene_media(result_msg):
-    """True si el mensaje tiene cualquier tipo de archivo (doc, foto, video, audio)."""
-    if not result_msg: return False
-    for campo in ('document', 'photo', 'video', 'audio', 'voice', 'video_note', 'animation'):
-        if campo in result_msg:
-            return True
-    return False
-
-def es_delimitador(result_msg):
-    """True si es texto puro sin ningún archivo (marca fin del juego)."""
-    if not result_msg: return True
-    if tiene_media(result_msg): return False
-    # Texto sin media = delimitador
-    return True
-
 def handle_codigo(chat_id, texto):
     if chat_id not in solicitudes: return
     datos = solicitudes[chat_id]
@@ -70,12 +55,6 @@ def handle_codigo(chat_id, texto):
         for _ in range(60):
             r = api('copyMessage', chat_id=chat_id, from_chat_id=CANAL_PRINCIPAL, message_id=current)
             if not r.get('ok'): break
-            result_msg = r.get('result', {})
-            if es_delimitador(result_msg):
-                try:
-                    api('deleteMessage', chat_id=chat_id, message_id=result_msg.get('message_id'))
-                except: pass
-                break
             copiados += 1; current += 1
             time.sleep(0.5)
         if copiados <= 1:
